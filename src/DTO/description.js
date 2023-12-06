@@ -1,3 +1,14 @@
+// To parse this data:
+//
+//   const Convert = require("./file");
+//
+//   const queryResult = Convert.toQueryResult(json);
+//
+// These functions will throw an error if the JSON doesn't
+// match the expected interface, even if the JSON is valid.
+
+// Converts JSON strings to/from your types
+// and asserts the results of JSON.parse at runtime
 function toQueryResult(json) {
     return cast(JSON.parse(json), r("QueryResult"));
 }
@@ -160,48 +171,48 @@ function r(name) {
 
 const typeMap = {
     "QueryResult": o([
-        { json: "head", js: "head", typ: r("Head") },
-        { json: "results", js: "results", typ: r("Results") },
+        { json: "head", js: "head", typ: u(undefined, r("Head")) },
+        { json: "results", js: "results", typ: u(undefined, r("Results")) },
     ], false),
     "Head": o([
-        { json: "vars", js: "vars", typ: a("") },
+        { json: "vars", js: "vars", typ: u(undefined, a("")) },
     ], false),
     "Results": o([
-        { json: "bindings", js: "bindings", typ: a(r("Binding")) },
+        { json: "bindings", js: "bindings", typ: u(undefined, a(r("Binding"))) },
     ], false),
     "Binding": o([
-        { json: "CarID", js: "CarID", typ: r("CarID") },
-        { json: "price", js: "price", typ: r("Cylinders") },
-        { json: "currency", js: "currency", typ: r("CarID") },
-        { json: "Cylinders", js: "Cylinders", typ: r("Cylinders") },
-        { json: "Doors", js: "Doors", typ: r("Cylinders") },
-        { json: "engineVolumeAmount", js: "engineVolumeAmount", typ: r("Cylinders") },
-        { json: "isEngineTurbo", js: "isEngineTurbo", typ: r("Cylinders") },
-        { json: "engineUnit", js: "engineUnit", typ: r("CarID") },
-        { json: "isLeatherInterior", js: "isLeatherInterior", typ: r("Cylinders") },
-        { json: "levyAmount", js: "levyAmount", typ: r("Cylinders") },
-        { json: "levyCurrency", js: "levyCurrency", typ: r("CarID") },
-        { json: "mileageAmount", js: "mileageAmount", typ: r("Cylinders") },
-        { json: "mileageUnit", js: "mileageUnit", typ: r("CarID") },
-        { json: "prodYear", js: "prodYear", typ: r("Cylinders") },
-        { json: "airbagsAmount", js: "airbagsAmount", typ: r("Cylinders") },
-        { json: "color", js: "color", typ: r("CarID") },
-        { json: "driveWheels", js: "driveWheels", typ: r("CarID") },
-        { json: "fuelType", js: "fuelType", typ: r("CarID") },
-        { json: "gearBoxType", js: "gearBoxType", typ: r("CarID") },
-        { json: "carCategory", js: "carCategory", typ: r("CarID") },
-        { json: "carManufacturer", js: "carManufacturer", typ: r("CarID") },
-        { json: "carModel", js: "carModel", typ: r("CarID") },
-        { json: "wheel", js: "wheel", typ: r("CarID") },
+        { json: "CarID", js: "CarID", typ: u(undefined, r("CarID")) },
+        { json: "price", js: "price", typ: u(undefined, r("Cylinders")) },
+        { json: "currency", js: "currency", typ: u(undefined, r("CarID")) },
+        { json: "Cylinders", js: "Cylinders", typ: u(undefined, r("Cylinders")) },
+        { json: "Doors", js: "Doors", typ: u(undefined, r("Cylinders")) },
+        { json: "engineVolumeAmount", js: "engineVolumeAmount", typ: u(undefined, r("Cylinders")) },
+        { json: "isEngineTurbo", js: "isEngineTurbo", typ: u(undefined, r("Cylinders")) },
+        { json: "engineUnit", js: "engineUnit", typ: u(undefined, r("CarID")) },
+        { json: "isLeatherInterior", js: "isLeatherInterior", typ: u(undefined, r("Cylinders")) },
+        { json: "levyAmount", js: "levyAmount", typ: u(undefined, r("Cylinders")) },
+        { json: "levyCurrency", js: "levyCurrency", typ: u(undefined, r("CarID")) },
+        { json: "mileageAmount", js: "mileageAmount", typ: u(undefined, r("Cylinders")) },
+        { json: "mileageUnit", js: "mileageUnit", typ: u(undefined, r("CarID")) },
+        { json: "prodYear", js: "prodYear", typ: u(undefined, r("Cylinders")) },
+        { json: "airbagsAmount", js: "airbagsAmount", typ: u(undefined, r("Cylinders")) },
+        { json: "color", js: "color", typ: u(undefined, r("CarID")) },
+        { json: "driveWheels", js: "driveWheels", typ: u(undefined, r("CarID")) },
+        { json: "fuelType", js: "fuelType", typ: u(undefined, r("CarID")) },
+        { json: "gearBoxType", js: "gearBoxType", typ: u(undefined, r("CarID")) },
+        { json: "carCategory", js: "carCategory", typ: u(undefined, r("CarID")) },
+        { json: "carManufacturer", js: "carManufacturer", typ: u(undefined, r("CarID")) },
+        { json: "carModel", js: "carModel", typ: u(undefined, r("CarID")) },
+        { json: "wheel", js: "wheel", typ: u(undefined, r("CarID")) },
     ], false),
     "CarID": o([
-        { json: "type", js: "type", typ: r("CarIDType") },
-        { json: "value", js: "value", typ: "" },
+        { json: "type", js: "type", typ: u(undefined, r("CarIDType")) },
+        { json: "value", js: "value", typ: u(undefined, "") },
     ], false),
     "Cylinders": o([
-        { json: "datatype", js: "datatype", typ: "" },
-        { json: "type", js: "type", typ: r("CylindersType") },
-        { json: "value", js: "value", typ: "" },
+        { json: "datatype", js: "datatype", typ: u(undefined, "") },
+        { json: "type", js: "type", typ: u(undefined, r("CylindersType")) },
+        { json: "value", js: "value", typ: u(undefined, "") },
     ], false),
     "CarIDType": [
         "uri",

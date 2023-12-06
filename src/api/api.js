@@ -1,18 +1,18 @@
 import { toQueryResult } from '../DTO/queryresult'; // Adjust the path
 // api.js
 
-export const fetchData = async (query, selectedOption) => {
+export const fetchData = async (query, selectedOption, page) => {
     let apiUrl = `http://127.0.0.1:8000/api/v1/`;
     
     switch (selectedOption) {
         case 'model':
-            apiUrl += `query_by_model?query=${query}`;
+            apiUrl += `query_by_model?query=${query}&page=${page}`;
             break;
         case 'manufacturer':
-            apiUrl += `query_by_manufacturer?query=${query}`;
+            apiUrl += `query_by_manufacturer?query=${query}&page=${page}`;
             break;
         default:
-            apiUrl += `query_by_model?query=${query}`;
+            apiUrl += `query_by_model?query=${query}&page=${page}`;
     }
 
     try {
