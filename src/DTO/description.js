@@ -204,21 +204,20 @@ const typeMap = {
         { json: "carManufacturer", js: "carManufacturer", typ: u(undefined, r("CarID")) },
         { json: "carModel", js: "carModel", typ: u(undefined, r("CarID")) },
         { json: "wheel", js: "wheel", typ: u(undefined, r("CarID")) },
+        { json: "manufacturerLabel", js: "manufacturerLabel", typ: u(undefined, r("CarID")) },
     ], false),
     "CarID": o([
-        { json: "type", js: "type", typ: u(undefined, r("CarIDType")) },
+        { json: "type", js: "type", typ: u(undefined, r("Type")) },
         { json: "value", js: "value", typ: u(undefined, "") },
     ], false),
     "Cylinders": o([
         { json: "datatype", js: "datatype", typ: u(undefined, "") },
-        { json: "type", js: "type", typ: u(undefined, r("CylindersType")) },
+        { json: "type", js: "type", typ: u(undefined, r("Type")) },
         { json: "value", js: "value", typ: u(undefined, "") },
     ], false),
-    "CarIDType": [
-        "uri",
-    ],
-    "CylindersType": [
+    "Type": [
         "literal",
+        "uri",
     ],
 };
 

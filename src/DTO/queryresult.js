@@ -1,3 +1,14 @@
+// To parse this data:
+//
+//   const Convert = require("./file");
+//
+//   const queryResult = Convert.toQueryResult(json);
+//
+// These functions will throw an error if the JSON doesn't
+// match the expected interface, even if the JSON is valid.
+
+// Converts JSON strings to/from your types
+// and asserts the results of JSON.parse at runtime
 function toQueryResult(json) {
     return cast(JSON.parse(json), r("QueryResult"));
 }
@@ -160,34 +171,34 @@ function r(name) {
 
 const typeMap = {
     "QueryResult": o([
-        { json: "head", js: "head", typ: r("Head") },
-        { json: "results", js: "results", typ: r("Results") },
+        { json: "head", js: "head", typ: u(undefined, r("Head")) },
+        { json: "results", js: "results", typ: u(undefined, r("Results")) },
     ], false),
     "Head": o([
-        { json: "vars", js: "vars", typ: a("") },
+        { json: "vars", js: "vars", typ: u(undefined, a("")) },
     ], false),
     "Results": o([
-        { json: "bindings", js: "bindings", typ: a(r("Binding")) },
+        { json: "bindings", js: "bindings", typ: u(undefined, a(r("Binding"))) },
     ], false),
     "Binding": o([
-        { json: "CarID", js: "CarID", typ: r("CarID") },
-        { json: "price", js: "price", typ: r("Price") },
-        { json: "currency", js: "currency", typ: r("CarID") },
+        { json: "CarID", js: "CarID", typ: u(undefined, r("CarID")) },
+        { json: "price", js: "price", typ: u(undefined, r("Price")) },
+        { json: "currency", js: "currency", typ: u(undefined, r("CarID")) },
+        { json: "manufacturer", js: "manufacturer", typ: u(undefined, r("CarID")) },
+        { json: "manufacturerLabel", js: "manufacturerLabel", typ: u(undefined, r("CarID")) },
     ], false),
     "CarID": o([
-        { json: "type", js: "type", typ: r("CarIDType") },
-        { json: "value", js: "value", typ: "" },
+        { json: "type", js: "type", typ: u(undefined, r("Type")) },
+        { json: "value", js: "value", typ: u(undefined, "") },
     ], false),
     "Price": o([
-        { json: "datatype", js: "datatype", typ: "" },
-        { json: "type", js: "type", typ: r("PriceType") },
-        { json: "value", js: "value", typ: "" },
+        { json: "datatype", js: "datatype", typ: u(undefined, "") },
+        { json: "type", js: "type", typ: u(undefined, r("Type")) },
+        { json: "value", js: "value", typ: u(undefined, "") },
     ], false),
-    "CarIDType": [
-        "uri",
-    ],
-    "PriceType": [
+    "Type": [
         "literal",
+        "uri",
     ],
 };
 

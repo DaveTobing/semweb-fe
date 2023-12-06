@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { InputGroup, Input, InputLeftElement, Select} from '@chakra-ui/react'
+import { InputGroup, Input, InputLeftElement, Select, Spinner} from '@chakra-ui/react'
 import { Search2Icon, CloseIcon } from '@chakra-ui/icons'
 import { Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading, Text, Button } from '@chakra-ui/react'
 import { fetchData } from '../api/api';
 import { fetchDataByPriceRange } from '../api/fetchDataByPriceRange ';
 import { fetchDataById } from '../api/fetchDescription';
 import { useSearchParams  } from 'react-router-dom';
-import { Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableCaption, TableContainer } from '@chakra-ui/react'
+import { Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer } from '@chakra-ui/react'
 
 const Landingpage = () => {
     const [query, setQuery] = useState('');
@@ -18,10 +18,15 @@ const Landingpage = () => {
     const [maximumPrice, setPriceMax] = useState(0);
 
     const[showModal, setShowModal] = useState(false)
-
     const [searchParams, setSearchParams] = useSearchParams(); // Create the navigate instance
-
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const closeModal = () => {
+        setSearchParams({ search: query })  
+        setShowModal(false);
+    };
 
     useEffect(() => {
         setCardData([]);
@@ -29,26 +34,27 @@ const Landingpage = () => {
         setCurrentPage(1);
     }, [selectedSearchType]);
 
-    const handleDescriptionClick = (id) => {
-        setShowModal(true);
-        setSearchParams({ description: id });
-        fetchDataById(id).then(data => {
-            if (data) {
-                setcardDescriptionData(data.results.bindings);
-            }
-        });
-    };
-  
-    const closeModal = () => {
-        setSearchParams({ search: query })  
-        setShowModal(false);
-    };
 
     useEffect(() => {
         fetchPageData();
     }, [currentPage]);
 
-    console.log(query)
+
+    const handleDescriptionClick = (id) => {
+        setShowModal(true);
+        setSearchParams({ description: id });
+        setIsLoading(true); 
+
+        setcardDescriptionData([])
+        fetchDataById(id).then(data => {
+            if (data) {
+                setcardDescriptionData(data.results.bindings);
+            }
+        }).finally(() => {
+            setIsLoading(false); // Hide loader once data is fetched
+        });
+    };
+  
 
     const fetchPageData = () => {
         if (selectedSearchType === 'priceRange' && minimumPrice && maximumPrice) {
@@ -56,42 +62,59 @@ const Landingpage = () => {
                 if (data) {
                     setCardData(data.results.bindings);
                 }
+            })
+            .finally(() => {
+                setIsLoading(false); // Hide loader in any case
             });
+            
         } 
         else if (query) {
             fetchData(query, selectedSearchType, currentPage).then(data => {
                 if (data) {
                     setCardData(data.results.bindings);
                 }
+            })
+            .finally(() => {
+                setIsLoading(false); // Hide loader in any case
             });
+            
         }
     };
     
     const handleSearchSubmit = (event) => {
         event.preventDefault();
+        setIsLoading(true)
         if (selectedSearchType !== 'priceRange'){
             if (query) {
                 fetchData(query, selectedSearchType, 1).then(data => {
                     if (data && data.results.bindings.length > 0) {
                         setCardData(data.results.bindings);
                         setSearchParams({ search: query });
-                        setCurrentPage(1); // Reset to page 1
+                        setCurrentPage(1);
                     } else {
-                        setCardData([]); // Clear results if no data
+                        setCardData([]);
                     }
+                })
+                .finally(() => { // Clear the timer
+                    setIsLoading(false); // Hide loader in any case
                 });
             }
+
         }
+
         else if (selectedSearchType === 'priceRange'){
             if (minimumPrice && maximumPrice) {
                 fetchDataByPriceRange(minimumPrice, maximumPrice, 1).then(data => {
                     if (data && data.results.bindings.length > 0) {
                         setCardData(data.results.bindings);
                         setSearchParams({ min: minimumPrice, max: maximumPrice });
-                        setCurrentPage(1); // Reset to page 1
+                        setCurrentPage(1);
                     } else {
                         setCardData([]); // Clear results if no data
                     }
+                })
+                .finally(() => {
+                    setIsLoading(false); // Hide loader in any case
                 });
             }
         }
@@ -99,20 +122,23 @@ const Landingpage = () => {
 
     const handleNextPage = () => {
         if (cardData.length > 0 && query) {
+            setIsLoading(true); // Start loading
             setCurrentPage(currentPage + 1);
         }
     };
     
     const handlePreviousPage = () => {
         if (currentPage > 1) {
+            setIsLoading(true); // Start loading
             setCurrentPage(prevPage => prevPage - 1);
         }
     };
 
     const extractIdFromUrl = (url) => {
-        const parts = url.split('/');
+        const parts = url.split('#');
         return parts[parts.length - 1];
     };
+
 
     return (
         <div className='bg-gray-800 flex justify-center flex-col h-screen pt-16'>
@@ -187,6 +213,15 @@ const Landingpage = () => {
                 <Button onClick={handleNextPage}>Next</Button>
             </div>
 
+            {isLoading && (
+                <>
+                    <div className="fixed inset-0 bg-black bg-opacity-50 z-[90]"></div>
+                    <div className="fixed inset-0 flex items-center justify-center  z-[90]">
+                        <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='blue.500' size='xl' />
+                    </div>
+                </>
+            )}
+
             <div className='bg-gray-800 flex px-32 mt-10 h-4/6 overflow-y-auto'>
                 <SimpleGrid columns={4} spacing={10}>
                         {cardData.map((card) => (
@@ -195,7 +230,7 @@ const Landingpage = () => {
                                     <Heading size='md'>Id: {extractIdFromUrl(card.CarID.value)}</Heading>
                                 </CardHeader>
                                 <CardBody>
-                                    <Text>Price: <a href={card.currency.value}>$</a> {card.price.value}</Text>
+                                    <Text fontSize='lg'>Price: <a href={card.currency.value}>$</a> {card.price.value}</Text>
                                 </CardBody>
                                 <CardFooter>
                                     <Button onClick={() => handleDescriptionClick(extractIdFromUrl(card.CarID.value))}>Description</Button>
@@ -207,7 +242,7 @@ const Landingpage = () => {
         
 
             {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-[40] text-white bg-black bg-opacity-60">
+                <div className="fixed inset-0 flex items-center justify-center z-[80] text-white bg-black bg-opacity-80">
                     <div className="relative w-[90%] h-[80%] md:w-[800px] md:h-[650px] p-4 rounded-lg bg-gray-800 overflow-hidden">
                         <CloseIcon onClick={closeModal} className="absolute top-4 right-4" style={{ fontSize: '1rem', color: '#FFF', cursor: 'pointer' }}/>
                         <h2 className='text-xl text-center pt-1'>Car Details</h2>
@@ -217,35 +252,38 @@ const Landingpage = () => {
                                     <TableCaption>Car Details</TableCaption>
                                     <Thead>
                                         <Tr>
-                                            <Th className='text-white'>Property</Th>
-                                            <Th>Value</Th>
+                                            <Th color='white' fontSize='lg'>Property</Th>
+                                            <Th color='white' fontSize='l'>Value</Th>
                                         </Tr>
                                     </Thead>
                                     <Tbody>
                                         {cardDescriptionData.map((card, index) => (
                                             <React.Fragment key={index}>
                                                 <Tr><Td>Id</Td><Td>{card.CarID.value}</Td></Tr>
-                                                <Tr><Td>Car Price</Td><Td>{card.price.value}</Td></Tr>
-                                                <Tr><Td>Car Value</Td><Td><a href={card.currency.value}>{extractIdFromUrl(card.currency.value)}</a></Td></Tr>
+                                                <Tr><Td>Car Price</Td><Td><a href={card.currency.value} className='text-[#9EC8B9]'> $ </a> <span> {card.price.value} </span></Td></Tr>
                                                 <Tr><Td>Total Cylinders</Td><Td>{card.Cylinders.value}</Td></Tr>
-                                                <Tr><Td>Total Doors</Td><Td>{card.Doors.value}</Td></Tr>
-                                                <Tr><Td>Engine Volume</Td><Td>{card.engineVolumeAmount.value}</Td></Tr>
-                                                <Tr><Td>Used Turbo?</Td><Td>{card.isEngineTurbo.value}</Td></Tr>
-                                                <Tr><Td>Engine Unit</Td><Td><a href={card.engineUnit.value}>{extractIdFromUrl(card.engineUnit.value)}</a></Td></Tr>
+                                                <Tr>
+                                                    <Td>Total Doors</Td>
+                                                    <Td>{card.Doors.value}</Td>
+                                                </Tr>
+                                                <Tr>
+                                                    <Td>Engine Volume</Td>
+                                                    <Td>{card.engineVolumeAmount.value} <a href={card.engineUnit.value} className='text-[#9EC8B9]'> Litre</a> 
+                                                    {card.isEngineTurbo.value? <span> Turbo </span>: null }</Td>
+                                                </Tr>
                                                 <Tr><Td>Leather Interior?</Td><Td>{card.isLeatherInterior.value}</Td></Tr>
-                                                {card.levyAmount?.value && <Tr><Td>Levy</Td><Td> <a href={card.levyCurrency.value}> $ </a> {card.levyAmount?.value}</Td></Tr>}
-                                                <Tr><Td>Total Mileage</Td><Td><a href={card.mileageAmount.value}>{extractIdFromUrl(card.mileageAmount.value)}</a></Td></Tr>
-                                                <Tr><Td>Mileage Unit</Td><Td><a href={card.mileageUnit.value}>{extractIdFromUrl(card.mileageUnit.value)}</a></Td></Tr>
+                                                {card.levyAmount?.value && <Tr><Td>Levy</Td><Td> <a href={card.levyCurrency.value} className='text-[#9EC8B9]'> $ </a> {card.levyAmount?.value}</Td></Tr>}
+                                                <Tr><Td>Total Mileage</Td><Td>{card.mileageAmount.value} <a href={card.mileageUnit.value} className='text-[#9EC8B9]'> KM </a></Td></Tr>
                                                 <Tr><Td>Production Year</Td><Td>{card.prodYear.value}</Td></Tr>
                                                 <Tr><Td>Total Airbags</Td><Td>{card.airbagsAmount.value}</Td></Tr>
-                                                <Tr><Td>Car Color</Td><Td><a href={card.color.value}>{extractIdFromUrl(card.color.value)}</a></Td></Tr>
-                                                <Tr><Td>Drive Systems</Td><Td><a href={card.driveWheels.value}>{extractIdFromUrl(card.driveWheels.value)}</a></Td></Tr>
-                                                <Tr><Td>Fuel Type</Td><Td><a href={card.fuelType.value}></a>{extractIdFromUrl(card.fuelType.value)}</Td></Tr>
-                                                <Tr><Td>Gearbox Type</Td><Td><a href={card.gearBoxType.value}>{extractIdFromUrl(card.gearBoxType.value)}</a></Td></Tr>
-                                                <Tr><Td>Car Category</Td><Td><a href={card.carCategory.value}>{extractIdFromUrl(card.carCategory.value)}</a></Td></Tr>
-                                                <Tr><Td>Car Manufacturer</Td><Td><a href={card.carManufacturer.value}>{extractIdFromUrl(card.carManufacturer.value)}</a></Td></Tr>
-                                                <Tr><Td>Car Model</Td><Td><a href={card.carModel.value}>{extractIdFromUrl(card.carModel.value)}</a></Td></Tr>
-                                                <Tr><Td>Steering Wheel</Td><Td><a href={card.wheel.value}>{extractIdFromUrl(card.wheel.value)}</a></Td></Tr>
+                                                <Tr><Td>Car Color</Td><Td>{extractIdFromUrl(card.color.value)}</Td></Tr>
+                                                <Tr><Td>Drive Systems</Td><Td>{extractIdFromUrl(card.driveWheels.value)}</Td></Tr>
+                                                <Tr><Td>Fuel Type</Td><Td>{extractIdFromUrl(card.fuelType.value)}</Td></Tr>
+                                                <Tr><Td>Gearbox Type</Td><Td>{extractIdFromUrl(card.gearBoxType.value)}</Td></Tr>
+                                                <Tr><Td>Car Category</Td><Td>{extractIdFromUrl(card.carCategory.value)}</Td></Tr>
+                                                <Tr><Td>Car Manufacturer</Td><Td><a href={card.carManufacturer.value} className='text-[#9EC8B9]'>{card.manufacturerLabel.value}</a></Td></Tr>
+                                                <Tr><Td>Car Model</Td><Td>{extractIdFromUrl(card.carModel.value)}</Td></Tr>
+                                                <Tr><Td>Steering Wheel</Td><Td>{extractIdFromUrl(card.wheel.value)}</Td></Tr>
                                             </React.Fragment>
                                         ))}
                                     </Tbody>
