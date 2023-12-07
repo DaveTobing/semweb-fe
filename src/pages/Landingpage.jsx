@@ -22,6 +22,7 @@ const Landingpage = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [sortOption, setSortOption] = useState('');
 
     const closeModal = () => {
         setSearchParams({ search: query })  
@@ -29,15 +30,37 @@ const Landingpage = () => {
     };
 
     useEffect(() => {
+        setPriceMin(0);
+        setPriceMax(0);
+        setQuery('');
         setCardData([]);
         setSearchParams();
         setCurrentPage(1);
+        setSortOption('');
     }, [selectedSearchType]);
 
 
     useEffect(() => {
         fetchPageData();
     }, [currentPage]);
+
+    useEffect(() => {
+        const sortData = (data, option) => {
+            switch (option) {
+                case 'High':
+                    return [...data].sort((a, b) => parseFloat(b.price.value) - parseFloat(a.price.value));
+                case 'Low':
+                    return [...data].sort((a, b) => parseFloat(a.price.value) - parseFloat(b.price.value));
+                default:
+                    return data;
+            }
+        };
+    
+        // Apply sorting
+        const sortedData = sortData(cardData, sortOption);
+        setCardData(sortedData);
+    }, [sortOption, cardData]);
+    
 
 
     const handleDescriptionClick = (id) => {
@@ -143,7 +166,7 @@ const Landingpage = () => {
     return (
         <div className='bg-gray-800 flex justify-center flex-col h-screen pt-16'>
             <div className='text-white flex flex-row justify-center gap-8 pb-8'>
-                <h1 className='text-white text-center text-3xl'>Car Price</h1>
+                <h1 className='text-white text-center text-3xl font-bold'>Car Price</h1>
             </div>
 
             {selectedSearchType !== 'priceRange' && (
@@ -190,7 +213,7 @@ const Landingpage = () => {
                 </div>
             )}
 
-            <div className='mx-[600px] pt-8'>
+            <div className='mx-[300px] pt-8 flex flex-row gap-8'>
                 <Select 
                     onChange={(e) => setSelectedSearchType(e.target.value)}
                     color='white'
@@ -204,6 +227,23 @@ const Landingpage = () => {
                     <option value='model'>Search by Model</option>
                     <option value='manufacturer'>Search by Manufacturer</option>
                     <option value='priceRange'>Search by Price Range</option>
+                    <option value='Category'>Search by Category</option>
+                </Select>
+                <Select 
+                      placeholder='Filter' 
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value)}
+                      color='white'
+                      sx={{
+                          bg: 'gray.700',
+                          '& > option': {
+                              bg: 'gray.700',
+                          },
+                      }}
+
+                      className={'text-textcolor-750 hover:cursor-pointer'}>
+                          <option value=  "High">Price: High-Low</option>
+                          <option value = "Low">Price: Low-high</option>
                 </Select>
             </div>
 
@@ -230,7 +270,7 @@ const Landingpage = () => {
                                     <Heading size='md'>Id: {extractIdFromUrl(card.CarID.value)}</Heading>
                                 </CardHeader>
                                 <CardBody>
-                                    <Text fontSize='lg'>Price: <a href={card.currency.value}>$</a> {card.price.value}</Text>
+                                    <Text fontSize='lg'>Price: <a className='text-[#9EC8B9]' href={card.currency.value}>$</a> {card.price.value}</Text>
                                 </CardBody>
                                 <CardFooter>
                                     <Button onClick={() => handleDescriptionClick(extractIdFromUrl(card.CarID.value))}>Description</Button>
@@ -245,7 +285,7 @@ const Landingpage = () => {
                 <div className="fixed inset-0 flex items-center justify-center z-[80] text-white bg-black bg-opacity-80">
                     <div className="relative w-[90%] h-[80%] md:w-[800px] md:h-[650px] p-4 rounded-lg bg-gray-800 overflow-hidden">
                         <CloseIcon onClick={closeModal} className="absolute top-4 right-4" style={{ fontSize: '1rem', color: '#FFF', cursor: 'pointer' }}/>
-                        <h2 className='text-xl text-center pt-1'>Car Details</h2>
+                        <h2 className='text-xl text-center pt-1 font-bold'>Car Details</h2>
                         <div className='overflow-y-auto h-full pb-5 '>
                             <TableContainer>
                                 <Table variant='simple'>

@@ -11,8 +11,10 @@ export const fetchData = async (query, selectedOption, page) => {
         case 'manufacturer':
             apiUrl += `query_by_manufacturer?query=${query}&page=${page}`;
             break;
+        case 'cateogry':
+            apiUrl += `query_by_manufacturer?query=${query}&page=${page}`
         default:
-            apiUrl += `query_by_model?query=${query}&page=${page}`;
+            apiUrl += `query_by_category?query=${query}&page=${page}`;
     }
 
     try {
