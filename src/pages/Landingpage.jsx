@@ -228,6 +228,7 @@ const Landingpage = () => {
             )}
 
             <div className='bg-gray-800 flex px-36 mt-10 h-4/6 overflow-y-auto'>
+            {cardData.length > 0 ? (
                 <SimpleGrid columns={4} spacing={10}>
                         {cardData.map((card) => (
                             <Card key={extractIdFromUrl(card.CarID.value)} height='200px' width='300px'>
@@ -240,9 +241,15 @@ const Landingpage = () => {
                                 <CardFooter>
                                     <Button onClick={() => handleDescriptionClick(extractIdFromUrl(card.CarID.value))}>Description</Button>
                                 </CardFooter>
-                            </Card>
-                        ))}
+                            </Card>    
+                        )
+                        )}
                 </SimpleGrid>
+                ) : (
+                    <div className="text-white text-center mx-auto">
+                        <h2 className='text-3xl text-center font-bold'>There is nothing on this page.</h2>
+                    </div>
+                )}
             </div>
         
 
