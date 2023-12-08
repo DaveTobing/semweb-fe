@@ -2,7 +2,7 @@ import { toQueryResult } from '../DTO/queryresult'; // Adjust the path
 // api.js
 
 export const fetchData = async (query, selectedOption, page) => {
-    let apiUrl = `http://127.0.0.1:8000/api/v1/`;
+    let apiUrl = `https://saya-mau-datang-dev-tbkd.2.sg-1.fl0.io/api/v1/`;
     
     switch (selectedOption) {
         case 'model':
