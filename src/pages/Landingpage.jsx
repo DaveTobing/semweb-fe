@@ -125,8 +125,8 @@ const Landingpage = () => {
     };
 
     const handleNextPage = () => {
-        if (cardData.length > 0 && query) {
-            setIsLoading(true); // Start loading
+        if ((cardData.length > 0 && query) || (cardData.length > 0 && minimumPrice && maximumPrice)){
+            setIsLoading(true);
             setCurrentPage(currentPage + 1);
         }
     };
