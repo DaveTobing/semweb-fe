@@ -22,7 +22,7 @@ const Landingpage = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [sortOption, setSortOption] = useState('');
+
 
     const closeModal = () => {
         setSearchParams({ search: query })  
@@ -36,31 +36,12 @@ const Landingpage = () => {
         setCardData([]);
         setSearchParams();
         setCurrentPage(1);
-        setSortOption('');
     }, [selectedSearchType]);
 
 
     useEffect(() => {
         fetchPageData();
     }, [currentPage]);
-
-    useEffect(() => {
-        const sortData = (data, option) => {
-            switch (option) {
-                case 'High':
-                    return [...data].sort((a, b) => parseFloat(b.price.value) - parseFloat(a.price.value));
-                case 'Low':
-                    return [...data].sort((a, b) => parseFloat(a.price.value) - parseFloat(b.price.value));
-                default:
-                    return data;
-            }
-        };
-    
-        // Apply sorting
-        const sortedData = sortData(cardData, sortOption);
-        setCardData(sortedData);
-    }, [sortOption, cardData]);
-    
 
 
     const handleDescriptionClick = (id) => {
@@ -229,22 +210,6 @@ const Landingpage = () => {
                     <option value='priceRange'>Search by Price Range</option>
                     <option value='Category'>Search by Category</option>
                 </Select>
-                <Select 
-                      placeholder='Sort By' 
-                      value={sortOption}
-                      onChange={(e) => setSortOption(e.target.value)}
-                      color='white'
-                      sx={{
-                          bg: 'gray.700',
-                          '& > option': {
-                              bg: 'gray.700',
-                          },
-                      }}
-
-                      className={'text-textcolor-750 hover:cursor-pointer'}>
-                          <option value=  "High">Price: High-Low</option>
-                          <option value = "Low">Price: Low-high</option>
-                </Select>
             </div>
 
             <div className='flex flex-row items-center justify-center pt-8 gap-8'>
@@ -265,7 +230,7 @@ const Landingpage = () => {
             <div className='bg-gray-800 flex px-32 mt-10 h-4/6 overflow-y-auto'>
                 <SimpleGrid columns={4} spacing={10}>
                         {cardData.map((card) => (
-                            <Card key={extractIdFromUrl(card.CarID.value)} height='200px' width='300px'>
+                            <Card key={extractIdFromUrl(card.CarID.value)} height='200px' width='350px'>
                                 <CardHeader>
                                     <Heading size='md'>Id: {extractIdFromUrl(card.CarID.value)}</Heading>
                                 </CardHeader>
