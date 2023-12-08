@@ -230,7 +230,7 @@ const Landingpage = () => {
                     <option value='Category'>Search by Category</option>
                 </Select>
                 <Select 
-                      placeholder='Filter' 
+                      placeholder='Sort By' 
                       value={sortOption}
                       onChange={(e) => setSortOption(e.target.value)}
                       color='white'
