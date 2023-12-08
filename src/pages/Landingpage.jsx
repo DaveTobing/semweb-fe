@@ -230,7 +230,7 @@ const Landingpage = () => {
             <div className='bg-gray-800 flex px-36 mt-10 h-4/6 overflow-y-auto'>
                 <SimpleGrid columns={4} spacing={10}>
                         {cardData.map((card) => (
-                            <Card key={extractIdFromUrl(card.CarID.value)} height='200px' width='350px'>
+                            <Card key={extractIdFromUrl(card.CarID.value)} height='200px' width='300px'>
                                 <CardHeader>
                                     <Heading size='md'>Id: {extractIdFromUrl(card.CarID.value)}</Heading>
                                 </CardHeader>
